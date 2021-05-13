@@ -1,0 +1,24 @@
+{
+  "name": "block-chain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "reset": "npx truffle deploy --reset && npm run step && npm run test",
+    "test": "npx truffle exec ./test/main.js",
+    "step": "./ganache-advance-time.sh 60",
+    "ganache": "npx ganache-cli -m 'bleak opinion yard bacon payment process atom tomorrow transfer flat misery where'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@truffle/hdwallet-provider": "1.2.2",
+    "truffle": "^5.3.5"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^0.1.7",
+    "@openzeppelin/contracts": "^4.1.0",
+    "ganache-cli": "^6.12.2"
+  }
+}
