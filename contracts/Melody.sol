@@ -86,12 +86,12 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
     }
 
     /// @notice Override the functions to not allow token transfers until the end of the ICO
-    function increaseApproval(address _spender, uint _addedValue) public afterCrowdsale returns(bool success) {
+    function increaseAllowance(address _spender, uint _addedValue) override public afterCrowdsale returns(bool success) {
         return super.increaseAllowance(_spender, _addedValue);
     }
 
     /// @notice Override the functions to not allow token transfers until the end of the ICO
-    function decreaseApproval(address _spender, uint _subtractedValue) public afterCrowdsale returns(bool success) {
+    function decreaseAllowance(address _spender, uint _subtractedValue) override public afterCrowdsale returns(bool success) {
         return super.decreaseAllowance(_spender, _subtractedValue);
     }
 
