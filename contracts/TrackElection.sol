@@ -92,7 +92,7 @@ contract TrackElection is Ownable, CommonModifier {
 	function getBalance() public view returns(uint256) { return address(this).balance; }
 	function getTokenBalance() public view returns(uint256) { return token.balanceOf(address(this)); }
 
-	function finalize() public onlyOwner /*whenClosed*/ {
+	function finalize() public onlyOwner whenClosed {
 		_finalize();
 		_distribute();
 
@@ -197,7 +197,7 @@ contract TrackElection is Ownable, CommonModifier {
 		}
 	}
 
-	function redeem() public onlyOwner /*whenClosed*/ {
+	function redeem() public onlyOwner whenClosed {
 		address addr = address(this);
 		uint256 token_amount = token.balanceOf(addr);
 		uint256 eth_amount = addr.balance;

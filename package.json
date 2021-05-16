@@ -8,7 +8,7 @@
     "test": "npx truffle exec ./test/main.js",
     "step": "./ganache-advance-time.sh 60",
     "ganache": "npx ganache-cli -m 'bleak opinion yard bacon payment process atom tomorrow transfer flat misery where'",
-    "test-crowdsale": "npx truffle exec ./test/crowdsale.js"
+    "manual-test-crowdsale": "npx truffle exec ./test/crowdsale.js"
   },
   "keywords": [],
   "author": "",

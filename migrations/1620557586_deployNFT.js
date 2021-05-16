@@ -1,5 +1,4 @@
 const Track = artifacts.require("Track");
-const TrackProxy = artifacts.require("TrackProxy")
 
 module.exports = async function(_deployer) {
   const Melody = artifacts.require("Melody")
