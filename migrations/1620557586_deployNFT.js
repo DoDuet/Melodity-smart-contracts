@@ -10,11 +10,4 @@ module.exports = async function(_deployer) {
     melody.address,
     100       // 100 MELD = song registration fee
   );
-
-  /*await _deployer.deploy(
-    TrackProxy,
-    melody.address,
-    track.address,
-    100
-  )*/
 };

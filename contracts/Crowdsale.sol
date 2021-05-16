@@ -73,10 +73,8 @@ contract Crowdsale is Ownable, CommonModifier {
         uint256 tokens_to_buy = computeTokensAmount();
 
         // Mint new tokens for each submission
-        token.mint(address(this), tokens_to_buy);
+        token.mint(msg.sender, tokens_to_buy);
         minted += tokens_to_buy;
-
-        token.buyTokens(msg.sender, tokens_to_buy);
 
         emit Buy(msg.sender, tokens_to_buy);
     }
@@ -85,42 +83,53 @@ contract Crowdsale is Ownable, CommonModifier {
         uint256 future_minted = minted;
         uint256 tokens_to_buy;
         uint256 current_round_tokens;      
-        uint256 ether_used = msg.value;  
+        uint256 ether_used = msg.value; 
+        uint256 future_round; 
+        uint256 rate;
+        uint256 upper_limit;
 
         for(uint256 i = 0; i < payment_tier.length; i++) {
+            // minor performance improvement, caches the value
+            upper_limit = payment_tier[i].upper_limit;
+
             if(
                 ether_used > 0 &&                                   // Check if there are still some funds in the request
                 future_minted >= payment_tier[i].lower_limit &&     // Check if the current rate can be applied with the lower_limit
-                future_minted < payment_tier[i].upper_limit         // Check if the current rate can be applied with the upper_limit
+                future_minted < upper_limit                         // Check if the current rate can be applied with the upper_limit
                 ) {
+                // minor performance improvement, caches the value
+                rate = payment_tier[i].rate;
                 
                 // Keep a static counter and reset it in each round
                 // NOTE: Order is important in value calculation
-                current_round_tokens = ether_used * 1e18 / 1 ether * payment_tier[i].rate;
+                current_round_tokens = ether_used * 1e18 / 1 ether * rate;
 
+                // minor performance optimization, caches the value
+                future_round = future_minted + current_round_tokens;
                 // If the tokens to mint exceed the upper limit of the tier reduce the number of token bounght in this round
-                if(future_minted + current_round_tokens > payment_tier[i].upper_limit) {
-                    current_round_tokens -= future_minted + current_round_tokens - payment_tier[i].upper_limit;
+                if(future_round > upper_limit) {
+                    current_round_tokens -= future_round - upper_limit;
                 }
 
                 // Update the future_minted counter with the current_round_tokens
                 future_minted += current_round_tokens;
 
                 // Recomputhe the available funds
-                ether_used -= current_round_tokens * 1 ether / payment_tier[i].rate / 1e18;
+                ether_used -= current_round_tokens * 1 ether / rate / 1e18;
 
                 // And add the funds to the total calculation
                 tokens_to_buy += current_round_tokens;
             }
         }
 
+        // minor performance optimization, caches the value
+        uint256 new_minted = minted + tokens_to_buy;
         // Check if we have reached and exceeded the funding goal to refund the exceeding tokens and ether
-        if(minted + tokens_to_buy > goal) {
-            uint256 exceedingTokens = minted + tokens_to_buy - goal;
-            uint256 exceedingEther;
+        if(new_minted > goal) {
+            uint256 exceedingTokens = new_minted - goal;
             
             // Convert the exceedingTokens to ether and refund that ether
-            exceedingEther = exceedingTokens * 1 ether / payment_tier[payment_tier.length -1].rate / 1e18;
+            uint256 exceedingEther = exceedingTokens * 1 ether / payment_tier[payment_tier.length -1].rate / 1e18;
             payable(msg.sender).transfer(exceedingEther);
 
             // Change the tokens to buy to the new number

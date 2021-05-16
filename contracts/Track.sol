@@ -13,6 +13,7 @@ contract Track is ERC721URIStorage, Ownable {
 
 	event TrackRegistered(address owner, uint256 track_id);
 	event FeePayed(address payer, uint256 fee);
+	event Redeemed(uint256 amount);
 	
 	uint256 song_registration_fee;
 	Melody token;
@@ -49,5 +50,13 @@ contract Track is ERC721URIStorage, Ownable {
 
 	function exists(uint256 track_id) public view returns(bool) {
 		return _exists(track_id);
+	}
+
+	function redeem() public onlyOwner {
+		address addr = address(this);
+		uint256 balance = token.balanceOf(addr);
+		token.transferFrom(addr, owner(), balance);
+
+		emit Redeemed(balance);
 	}
 }

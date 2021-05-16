@@ -26,8 +26,8 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
         _;
     }
 
-    constructor() ERC20("Melody", "MELD") ERC20Permit("Melody") {
-        _mint(msg.sender, 2e9 * 10 ** super.decimals());
+    constructor(uint256 _preminted) ERC20("Melody", "MELD") ERC20Permit("Melody") {
+        _mint(msg.sender, _preminted);
     }
 
     function pause() public onlyOwner {
@@ -42,11 +42,7 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
         _mint(to, amount);
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount)
-        internal
-        whenNotPaused
-        override
-    {
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
         super._beforeTokenTransfer(from, to, amount);
     }
 
@@ -55,19 +51,9 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
 		crowdsaleAddress = _crowdsaleAddress;
 	}
 
-	function buyTokens(address _receiver, uint256 _amount) public onlyCrowdsale {
-		require(_receiver != address(0));
-		require(_amount > 0);
-		transfer(_receiver, _amount);
-	}
-
     function setIcoEndTime(uint256 _time) public onlyOwner {
         require(block.timestamp < _time, "Ico cannot end in the past");
         ICOEndTime = _time;
-    }
-
-    function getBlockTime() public view returns(uint256 timestamp) {
-        return block.timestamp;
     }
 
     /// @notice Override the functions to not allow token transfers until the end of the ICO
@@ -95,8 +81,7 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
         return super.decreaseAllowance(_spender, _subtractedValue);
     }
 
-    function emergencyExtract() external onlyOwner {
-        address payable _owner = payable(super.owner());
-        _owner.transfer(address(this).balance);
+    function redeem() public onlyOwner {
+        payable(owner()).transfer(address(this).balance);
     }
 }

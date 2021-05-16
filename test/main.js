@@ -25,6 +25,7 @@ module.exports = async function main(callback) {
 		mint: true,
 		nft: false,
 		nft_delete: false,
+		vote: true,
 	}
   
 	try {
@@ -48,9 +49,23 @@ module.exports = async function main(callback) {
 		//	+-----------------------------------------------------------------------------------+
 		// 	| Remember to request approval for all the contracts that requires token management |
 		//  +-----------------------------------------------------------------------------------+
+		//  Approval cost 0.00183184 BNB
+		//  Vote cost 0.00267458 BNB
 		for(let acc of accounts) {
 			melody.approve(track.address, `1${"0".repeat(36)}`, {from: acc})
 			melody.approve(track_election.address, `1${"0".repeat(36)}`, {from: acc})
+			console.log(
+				"Balance of ",
+				acc,
+				prettyDecimals(await melody.balanceOf(acc)),
+				symbol
+			)
+			console.log(
+				"Balance of",
+				acc,
+				prettyDecimals(await web3.eth.getBalance(acc)),
+				"BNB"
+			)
 		}
 
 		// TESTS.MINT
@@ -123,6 +138,20 @@ module.exports = async function main(callback) {
 				prettyDecimals(await web3.eth.getBalance(accounts[1])),
 				"BNB"
 			)
+
+			console.log(
+				"Balance of",
+				accounts[0],
+				prettyDecimals(await melody.balanceOf(accounts[0])),
+				symbol,
+			)
+			console.log(
+				"Balance of",
+				accounts[0],
+				prettyDecimals(await web3.eth.getBalance(accounts[0])),
+				"BNB"
+			)	
+
 			console.log()
 
 			console.groupEnd()
@@ -144,6 +173,74 @@ module.exports = async function main(callback) {
 
 			await track.deleteTrack(1, {from: accounts[1]})
 			console.log("Track deleted")
+
+			console.groupEnd()
+		}
+
+
+		// TESTS.VOTE
+		if(tests.vote) {
+			console.group("test.vote")
+
+			console.log("Registering NFT tracks")
+			await track.registerTrack(accounts[1], "https://example.com/1", {from: accounts[1]}) // id 1
+			await track.registerTrack(accounts[2], "https://example.com/2", {from: accounts[2]}) // id 2
+
+			console.log("Self voting, the following test should fail")
+			try {
+				await track_election.vote(1, 2.5 * 2, {from: accounts[1]})
+			} catch(e) {
+				console.log()
+				console.error(e.message)
+				console.log()
+			}
+
+			for(let [id, acc] of accounts.entries()) {
+				if(id != 1 && id != 2) {
+					console.log(acc, "giving 2.5 full stars to NFT", 2)
+						
+					await track_election.vote(2, 2.5 * 2, {from: acc})
+				}
+			}
+
+			console.log(
+				"Track election balance",
+				prettyDecimals(await track_election.getBalance()),
+				"BNB"
+			)
+			console.log(
+				"Track election token balance",
+				prettyDecimals(await track_election.getTokenBalance()),
+				symbol
+			)
+
+			console.log("Finalizing")
+			await track_election.finalize()
+
+			console.log(
+				"Track election balance",
+				prettyDecimals(await track_election.getBalance()),
+				"BNB"
+			)
+			console.log(
+				"Track election token balance",
+				prettyDecimals(await track_election.getTokenBalance()),
+				symbol
+			)
+			for(let acc of accounts) {
+				console.log(
+					"Balance of ",
+					acc,
+					prettyDecimals(await melody.balanceOf(acc)),
+					symbol
+				)
+				console.log(
+					"Balance of",
+					acc,
+					prettyDecimals(await web3.eth.getBalance(acc)),
+					"BNB"
+				)
+			}
 
 			console.groupEnd()
 		}

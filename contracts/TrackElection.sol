@@ -42,7 +42,6 @@ contract TrackElection is Ownable, CommonModifier {
 
 	modifier canVote(uint256 track_id, uint256 half_stars) {
 		require(track.exists(track_id), "Track does not exist");
-		require(token.balanceOf(msg.sender) >= half_stars * half_star_value, "Not enough funds to give this vote");
 		require(!participants[track_id].voters.contains(msg.sender), "Track already voted");
 		require(msg.sender != track.ownerOf(track_id), "Cannot vote your own track");
 		_;
@@ -64,26 +63,25 @@ contract TrackElection is Ownable, CommonModifier {
 		prize_fee = _prize_fee;
 	}
 
-	function payVoteFee(uint256 half_star) internal {
-		uint256 amount = half_star_value * half_star;
+	function payVoteFee(uint256 vote_value) internal {
+		token.transferFrom(msg.sender, address(this), vote_value);
 
-		token.approve(address(this), amount);
-		token.transferFrom(msg.sender, address(this), amount);
-
-		emit FeePayed(msg.sender, amount);
+		emit FeePayed(msg.sender, vote_value);
 	}
 
 	function vote(uint256 track_id, uint256 half_stars) public whenRunning canVote(track_id, half_stars) payable {
-		payVoteFee(half_stars);
+		uint256 vote_value = half_star_value * half_stars;
+
+		require(token.balanceOf(msg.sender) >= vote_value, "Not enough funds to give this vote");
+		payVoteFee(vote_value);
 		
 		voted_songs.add(track_id);
 		participants[track_id].votes += half_stars;
 
 		// Check if the track owner is changed or if it null and update it
 		address track_owner = track.ownerOf(track_id);
-		if(participants[track_id].owner != track_owner) {
-			participants[track_id].owner = track_owner;
-		}
+		// Avoid checking for difference to reduce gas fee
+		participants[track_id].owner = track_owner;
 
 		// Add the address of the voter to the set of voters if not yet present
 		participants[track_id].voters.add(msg.sender);
@@ -94,15 +92,16 @@ contract TrackElection is Ownable, CommonModifier {
 	function getBalance() public view returns(uint256) { return address(this).balance; }
 	function getTokenBalance() public view returns(uint256) { return token.balanceOf(address(this)); }
 
-	function finalize() public onlyOwner whenClosed {
+	function finalize() public onlyOwner /*whenClosed*/ {
 		_finalize();
 		_distribute();
 
 		emit AllPrizesDistributed();
+
 		redeem();
 	}
 
-	function swapTrack(Ranking memory new_ranking, Ranking memory old_ranking) internal pure returns(Ranking memory, Ranking memory) {
+	function _swapTrack(Ranking memory new_ranking, Ranking memory old_ranking) internal pure returns(Ranking memory, Ranking memory) {
 		if(new_ranking.votes > old_ranking.votes) {
 			return (old_ranking, new_ranking);
 		}
@@ -122,7 +121,7 @@ contract TrackElection is Ownable, CommonModifier {
 			track_id = voted_songs.at(i);
 
 			// Check if current track has more votes than the first one, in case swap them
-			(old, first_place) = swapTrack(
+			(old, first_place) = _swapTrack(
 				Ranking({
 					votes: participants[track_id].votes, 
 					track_id: track_id
@@ -132,56 +131,53 @@ contract TrackElection is Ownable, CommonModifier {
 
 			// Check if the track with less votes in the previous step has more votes than 
 			// the one marked as second, in case swap them
-			(old, second_place) = swapTrack(old, second_place);
+			(old, second_place) = _swapTrack(old, second_place);
 
 			// Check if the track with less votes in the previous step has more votes than 
 			// the one marked as third, in case swap them, the one with less votes is simply
 			// trashed
-			(, third_place) = swapTrack(old, third_place);
+			(, third_place) = _swapTrack(old, third_place);
 		}
 
-		(uint256 first_place_prize, address first_place_address) = computeMusicianPrize(1, first_place);
-		(uint256 second_place_prize, address second_place_address) = computeMusicianPrize(2, second_place);
-		(uint256 third_place_prize, address third_place_address) = computeMusicianPrize(3, third_place);
+		(uint256 first_place_prize, address first_place_address) = _computeMusicianPrize(1, first_place);
+		(uint256 second_place_prize, address second_place_address) = _computeMusicianPrize(2, second_place);
+		(uint256 third_place_prize, address third_place_address) = _computeMusicianPrize(3, third_place);
 
 		uint256 balance = token.balanceOf(address(this)) - first_place_prize - second_place_prize - third_place_prize;
 
 		// Send the prizes to the winners and investors
-		sendPrize(first_place, first_place_address, first_place_prize, 1, balance);
-		sendPrize(second_place, second_place_address, second_place_prize, 2, balance);
-		sendPrize(third_place, third_place_address, third_place_prize, 3, balance);
+		_sendPrize(first_place, first_place_address, first_place_prize, 1, balance);
+		_sendPrize(second_place, second_place_address, second_place_prize, 2, balance);
+		_sendPrize(third_place, third_place_address, third_place_prize, 3, balance);
 	}
 
-	function computeMusicianPrize(uint8 position, Ranking memory ranking) internal view returns(uint256, address) {
+	function _computeMusicianPrize(uint8 position, Ranking memory ranking) internal view returns(uint256, address) {
 		uint256 prize = ranking.votes * half_star_value * 100; // normalize fee percentage given as integer
 		uint256 fee = ranking.votes * half_star_value * prize_fee * position;
 
 		return ((prize - fee) / 100, participants[ranking.track_id].owner);
 	}
 
-	function computeInverstorPrize(uint256 balance, uint8 position, Ranking memory ranking) internal view returns(uint256) {
+	function _computeInverstorPrize(uint256 balance, uint8 position, Ranking memory ranking) internal view returns(uint256) {
 		// the balance is divided in 8 chunks (125 is 0.125 of the total) each position receive the specified chunk
-		uint256 prize = balance * 125 * fixedPercentage(position);
+		// shifted right by 2; returns 4, 2.75 or 1.25 which are the shares of the total balance given to the investor of the classified
+		uint256 prize = balance * 125 * (position == 1 ? 400 : (position == 2 ? 275 : 125));
 		uint256 fee = prize * 5 * position;
 
 		return (prize * 100 - fee) / participants[ranking.track_id].voters.length() / 1e7;
 	}
 
-	function fixedPercentage(uint8 position) internal pure returns(uint256) {
-		// shifted right by 2; returns 4, 2.75 or 1.25 which are the shares of the total balance given to the investor of the classified
-		return position == 1 ? 400 : (position == 2 ? 275 : 125);
-	}
-
-	function sendPrizeToInvestor(Song storage song, uint256 prize, uint8 position) internal {
+	function _sendPrizeToInvestor(Song storage song, uint256 prize, uint8 position) internal {
 		for(uint256 i; i < song.voters.length(); i++) {
 			address investor = song.voters.at(i);
 
 			token.transfer(investor, prize);
+
 			emit PrizeForInvestor(investor, prize, position);
 		}
 	}
 
-	function sendPrize(
+	function _sendPrize(
 		Ranking memory rank, 
 		address first_place_address, 
 		uint256 first_place_prize, 
@@ -192,20 +188,22 @@ contract TrackElection is Ownable, CommonModifier {
 		if(rank.track_id != 0) {
 			// send prize to the winner
 			token.transfer(first_place_address, first_place_prize);
+
 			emit PrizeForMusician(first_place_address, first_place_prize, position);
 			
 			// send prize to the investors
-			uint256 investor_prize = computeInverstorPrize(balance, 1, rank);
-			sendPrizeToInvestor(participants[rank.track_id], investor_prize, position);
+			uint256 investor_prize = _computeInverstorPrize(balance, 1, rank);
+			_sendPrizeToInvestor(participants[rank.track_id], investor_prize, position);
 		}
 	}
 
-	function redeem() public onlyOwner whenClosed {
-		uint256 token_amount = getTokenBalance();
-		uint256 eth_amount = getBalance();
+	function redeem() public onlyOwner /*whenClosed*/ {
+		address addr = address(this);
+		uint256 token_amount = token.balanceOf(addr);
+		uint256 eth_amount = addr.balance;
 
 		// Transfer all the tokens (and ether if someone sent it) to the owner
-		token.transfer(owner(), token_amount);
+		token.transferFrom(addr, owner(), token_amount);
 		payable(owner()).transfer(eth_amount);
 
 		emit Redeemed(token_amount, eth_amount);
