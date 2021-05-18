@@ -192,7 +192,8 @@ contract TrackElection is Ownable, CommonModifier {
 		// NOTE: half is left on the contract as after the call to _distribute there is an automated call to
 		// NOTE: redeem
 
-		// TODO: Handle the transfer to the LP (PanckakeSwap)
+		// Handle the transfer to the LP (PanckakeSwap)
+		// NOTE: Some liquidity must be added to the platform before running this function!!!!
 		uint256 initialBalance = address(this).balance;
 		uint256 change = half / 2;
 		// Swap 50% of the left amount in ETH so that can be added to the LP
