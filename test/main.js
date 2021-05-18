@@ -20,6 +20,17 @@ module.exports = async function main(callback) {
 	  const str = number.toString()
 	  return `${prettyNumber(str.substr(0, str.length - decimals)) || 0}.${str.substr(str.length - decimals) || 0}`
 	}
+
+	const tryUntilDone = async (fn) => {
+		let state = false;
+		while(!state) {
+			try {
+				await fn()
+				state = true
+			}
+			catch(e) { console.log(e.message) }
+		}
+	}
   
 	tests = {
 		mint: true,
@@ -45,6 +56,8 @@ module.exports = async function main(callback) {
 		// Track nft
 		const Track = artifacts.require('Track')
 		const track = await Track.deployed()
+
+		console.log("[+]\tMelody supply", prettyDecimals(await melody.totalSupply()))
 
 		//	+-----------------------------------------------------------------------------------+
 		// 	| Remember to request approval for all the contracts that requires token management |
@@ -77,26 +90,31 @@ module.exports = async function main(callback) {
 			for(let acc of accounts) {
 				console.log("Minting", prettyDecimals(tokens), symbol, "to", acc);
 
-				await melody.mint(acc, tokens)
+				await tryUntilDone(async () => {
+					await melody.mint(acc, tokens)
 
-				console.log(
-					"Balance of",
-					acc,
-					prettyDecimals(await melody.balanceOf(acc)),
-					symbol,
-				)
-				console.log(
-					"Balance of",
-					acc,
-					prettyDecimals(await web3.eth.getBalance(acc)),
-					"BNB"
-				)
+					console.log(
+						"Balance of",
+						acc,
+						prettyDecimals(await melody.balanceOf(acc)),
+						symbol,
+					)
+					console.log(
+						"Balance of",
+						acc,
+						prettyDecimals(await web3.eth.getBalance(acc)),
+						"BNB"
+					)
+				})
 				console.log()
 			}
 
 			console.groupEnd()
 		}
 		
+		await tryUntilDone(async () => {
+			console.log("[+]\tMelody supply", prettyDecimals(await melody.totalSupply()))
+		})
 
 		// TESTS.NFT
 		if(tests.nft) {
@@ -157,6 +175,9 @@ module.exports = async function main(callback) {
 			console.groupEnd()
 		}
 
+		await tryUntilDone(async () => {
+			console.log("[+]\tMelody supply", prettyDecimals(await melody.totalSupply()))
+		})
 
 		// TESTS.NFT_DELETE
 		if(tests.nft_delete) {
@@ -183,12 +204,32 @@ module.exports = async function main(callback) {
 			console.group("test.vote")
 
 			console.log("Registering NFT tracks")
-			await track.registerTrack(accounts[1], "https://example.com/1", {from: accounts[1]}) // id 1
-			await track.registerTrack(accounts[2], "https://example.com/2", {from: accounts[2]}) // id 2
+			await tryUntilDone(async () => {
+				await track.registerTrack(accounts[1], "https://example.com/1", {from: accounts[1]}) // id 1
+			}) 
+			await tryUntilDone(async () => {
+				await track.registerTrack(accounts[2], "https://example.com/2", {from: accounts[2]}) // id 2
+			}) 
+			await tryUntilDone(async () => {
+				await track.registerTrack(accounts[3], "https://example.com/3", {from: accounts[3]}) // id 3
+			}) 	
+
+			console.log("Participating to the election")
+			await tryUntilDone(async () => {
+				await track_election.participate(1, {from: accounts[1]})
+			}) 	
+			await tryUntilDone(async () => {
+				await track_election.participate(2, {from: accounts[2]})
+			}) 	
+			await tryUntilDone(async () => {
+				await track_election.participate(3, {from: accounts[3]})
+			}) 	
 
 			console.log("Self voting, the following test should fail")
 			try {
 				await track_election.vote(1, 2.5 * 2, {from: accounts[1]})
+				// Mint the tokens to the voter
+				await melody.mint(accounts[1], `10${"0".repeat(18)}`)
 			} catch(e) {
 				console.log()
 				console.error(e.message)
@@ -196,10 +237,26 @@ module.exports = async function main(callback) {
 			}
 
 			for(let [id, acc] of accounts.entries()) {
-				if(id != 1 && id != 2) {
+				if(id != 1 && id != 2 && id != 3) {
 					console.log(acc, "giving 2.5 full stars to NFT", 2)
-						
-					await track_election.vote(2, 2.5 * 2, {from: acc})
+					
+					await tryUntilDone(async () => {
+						await track_election.vote(2, 2.5 * 2, {from: acc})
+					}) 
+					if(id % 2 === 0){
+						await tryUntilDone(async () => {
+							await track_election.vote(1, 2.5 * 2, {from: acc})
+						}) 
+					}
+					if(id % 3 === 0){
+						await tryUntilDone(async () => {
+							await track_election.vote(3, 2.5 * 2, {from: acc})
+						}) 
+					}
+					// Mint the tokens to the voter
+					await tryUntilDone(async () => {
+						await melody.mint(acc, `10${"0".repeat(18)}`)
+					}) 
 				}
 			}
 
@@ -215,7 +272,10 @@ module.exports = async function main(callback) {
 			)
 
 			console.log("Finalizing")
-			await track_election.finalize()
+			await tryUntilDone(async () => {
+				await track_election.finalize()
+			}) 
+			
 
 			console.log(
 				"Track election balance",
@@ -244,6 +304,8 @@ module.exports = async function main(callback) {
 
 			console.groupEnd()
 		}
+
+		console.log("[+]\tMelody supply", prettyDecimals(await melody.totalSupply()))
 
 		callback(0)
 	} catch (error) {

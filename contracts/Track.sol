@@ -39,7 +39,7 @@ contract Track is ERC721URIStorage, Ownable {
     }
 
 	function payRegistrationFee() internal {
-		token.transferFrom(msg.sender, owner(), song_registration_fee);
+		token.burnFrom(msg.sender, song_registration_fee);
 		emit FeePayed(msg.sender, song_registration_fee);
 	}
 

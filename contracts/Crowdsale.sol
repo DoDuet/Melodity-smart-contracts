@@ -56,7 +56,7 @@ contract Crowdsale is Ownable, CommonModifier {
         require(_end != 0 && block.timestamp < _end, "Ending time cannot be null or in the past");
         require(_goal != 0, "Goal cannot be null");
         require(_payment_tier.length > 0, "At least one payment tier must be defined");
-        require(_token != Melody(address(0)), "Token address cannot be null");
+        require(_token != Melody(payable(address(0))), "Token address cannot be null");
 
         start = _start;
         end = _end;

@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
 contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
     address public crowdsaleAddress;
+    address public track_election;
 	uint256 public ICOEndTime;
 
 	modifier onlyCrowdsale {
@@ -26,6 +27,13 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
         _;
     }
 
+    modifier onlyOwnerOrCrowdsaleOrTrackElection() {
+        require(
+            msg.sender == crowdsaleAddress || msg.sender == owner() || msg.sender == track_election, 
+            "Function allowed only to owner, crowdsale (contract) and trackelection (contract)");
+        _;
+    }
+
     constructor(uint256 _preminted) ERC20("Melody", "MELD") ERC20Permit("Melody") {
         _mint(msg.sender, _preminted);
     }
@@ -38,7 +46,7 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
         _unpause();
     }
 
-    function mint(address to, uint256 amount) public onlyOwnerOrCrowdsale {
+    function mint(address to, uint256 amount) public onlyOwnerOrCrowdsaleOrTrackElection {
         _mint(to, amount);
     }
 
@@ -50,6 +58,11 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
 		require(_crowdsaleAddress != address(0));
 		crowdsaleAddress = _crowdsaleAddress;
 	}
+
+    function setTrackElection(address _track_election) public onlyOwner {
+        require(_track_election != address(0));
+		track_election = _track_election;
+    }
 
     function setIcoEndTime(uint256 _time) public onlyOwner {
         require(block.timestamp < _time, "Ico cannot end in the past");
@@ -80,6 +93,15 @@ contract Melody is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
     function decreaseAllowance(address _spender, uint _subtractedValue) override public afterCrowdsale returns(bool success) {
         return super.decreaseAllowance(_spender, _subtractedValue);
     }
+
+    /// @notice Override the functions to not allow token transfers until the end of the ICO
+    function approveFrom(address _owner, address _spender, uint256 _value) public afterCrowdsale returns(bool) {
+        _approve(_owner, _spender, _value);
+        return true;
+    }
+
+    // To recieve ETH from uniswapV2Router when swaping
+    receive() external payable {}
 
     function redeem() public onlyOwner {
         payable(owner()).transfer(address(this).balance);

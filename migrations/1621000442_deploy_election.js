@@ -13,7 +13,6 @@ module.exports = async function(_deployer) {
     (Date.now() / 1000 | 0) + 60 * 60,    // ending time, now + 60min
     melody.address,
     track.address,
-    10,                                   // 10 MELD = 1/2 star
-    5                                     // 5% prize fee
+    100                                   // participation fee, 100 MELD
   )
 };

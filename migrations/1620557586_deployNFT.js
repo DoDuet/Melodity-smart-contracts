@@ -7,6 +7,6 @@ module.exports = async function(_deployer) {
   const track = await _deployer.deploy(
     Track,
     melody.address,
-    100       // 100 MELD = song registration fee
+    150       // 150 MELD = song registration fee
   );
 };
