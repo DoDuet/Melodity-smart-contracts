@@ -14,7 +14,7 @@ swap tokens.
 To deploy follow the next steps:
 
 1) Ensure the proper contract for the PancakeSwap router is set in TrackElection.sol 
-2) Ensure to hove enough BNB liquidity for gas fees and to fill the LP (~1 BNB)
+2) Ensure to have enough BNB liquidity for gas fees and to fill the LP (~1 BNB)
 3) Deploy Melody
 4) Properly set the token rates to release on the ICO
 5) Deploy ICO (if needed)
