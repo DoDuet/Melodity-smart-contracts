@@ -9,8 +9,8 @@ module.exports = async function(_deployer) {
 
   await _deployer.deploy(
     TrackElection, 
-    (Date.now() / 1000 | 0) + 60,         // starting time, now + 60s
-    (Date.now() / 1000 | 0) + 60 * 60,    // ending time, now + 60min
+    (Date.now() / 1000 | 0) + 5 * 60,         // starting time, now + 5min
+    (Date.now() / 1000 | 0) + 60 * 60 * 24 * 90,    // ending time, now + 90gg
     melody.address,
     track.address,
     100                                   // participation fee, 100 MELD

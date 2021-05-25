@@ -3,11 +3,13 @@ pragma solidity ^0.8.0;
 
 import "./Melody.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract Track is ERC721URIStorage, Ownable {
+contract Track is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -18,22 +20,50 @@ contract Track is ERC721URIStorage, Ownable {
 	uint256 song_registration_fee;
 	Melody token;
 
+	string private _baseTokenURI;
+
 	modifier canRegisterSong() {
 		require(token.balanceOf(msg.sender) >= song_registration_fee, "Not enough funds to register a song");
 		_;
 	}
 
-    constructor(Melody _token, uint256 _song_registration_fee) ERC721("MelodyTrack", "MELDT") {
+    constructor(Melody _token, uint256 _song_registration_fee, string memory baseTokenURI) ERC721("MelodyTrack", "MELDT") {
 		token = _token;
 		song_registration_fee = _song_registration_fee * 1 ether;
+		_baseTokenURI = baseTokenURI;
 	}
 
-    function registerTrack(address musician, string memory tokenURI) public canRegisterSong {
+    function _baseURI() internal view override returns (string memory) {
+        return _baseTokenURI;
+    }
+
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
+    function registerTrack(address musician) public canRegisterSong {
 		payRegistrationFee();
 
-        uint256 track_id = genTrackId();
-        _mint(musician, track_id);
-        _setTokenURI(track_id, tokenURI);
+		uint256 track_id = _tokenIds.current();
+        _safeMint(musician, track_id);
+        _tokenIds.increment();
 
 		emit TrackRegistered(msg.sender, track_id);
     }
@@ -41,11 +71,6 @@ contract Track is ERC721URIStorage, Ownable {
 	function payRegistrationFee() internal {
 		token.burnFrom(msg.sender, song_registration_fee);
 		emit FeePayed(msg.sender, song_registration_fee);
-	}
-
-	function genTrackId() internal returns(uint256) {
-		_tokenIds.increment();
-		return _tokenIds.current();
 	}
 
 	function exists(uint256 track_id) public view returns(bool) {

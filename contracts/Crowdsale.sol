@@ -70,7 +70,8 @@ contract Crowdsale is Ownable, CommonModifier {
 
     function buy() public whenRunning whenNotCompleted payable {
         // If a fixed rate is provided compute the amount of token to buy based on the rate
-        uint256 tokens_to_buy = computeTokensAmount();
+        (uint256 tokens_to_buy, uint256 exceedingEther) = computeTokensAmount(msg.value);
+        payable(msg.sender).transfer(exceedingEther);
 
         // Mint new tokens for each submission
         token.mint(msg.sender, tokens_to_buy);
@@ -79,11 +80,11 @@ contract Crowdsale is Ownable, CommonModifier {
         emit Buy(msg.sender, tokens_to_buy);
     }
 
-    function computeTokensAmount() internal whenRunning returns(uint256) {
+    function computeTokensAmount(uint256 funds) public whenRunning view returns(uint256, uint256) {
         uint256 future_minted = minted;
         uint256 tokens_to_buy;
         uint256 current_round_tokens;      
-        uint256 ether_used = msg.value; 
+        uint256 ether_used = funds; 
         uint256 future_round; 
         uint256 rate;
         uint256 upper_limit;
@@ -124,19 +125,20 @@ contract Crowdsale is Ownable, CommonModifier {
 
         // minor performance optimization, caches the value
         uint256 new_minted = minted + tokens_to_buy;
+        uint256 exceedingEther;
         // Check if we have reached and exceeded the funding goal to refund the exceeding tokens and ether
         if(new_minted > goal) {
             uint256 exceedingTokens = new_minted - goal;
             
             // Convert the exceedingTokens to ether and refund that ether
-            uint256 exceedingEther = exceedingTokens * 1 ether / payment_tier[payment_tier.length -1].rate / 1e18;
-            payable(msg.sender).transfer(exceedingEther);
+            exceedingEther = exceedingTokens * 1 ether / payment_tier[payment_tier.length -1].rate / 1e18;
+            
 
             // Change the tokens to buy to the new number
             tokens_to_buy -= exceedingTokens;
         }
 
-        return tokens_to_buy;
+        return (tokens_to_buy, exceedingEther);
     }
 
     function finalize() public onlyOwner whenClosed whenNotCompleted {

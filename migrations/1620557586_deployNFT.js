@@ -7,6 +7,7 @@ module.exports = async function(_deployer) {
   const track = await _deployer.deploy(
     Track,
     melody.address,
-    150       // 150 MELD = song registration fee
+    150,       // 150 MELD = song registration fee,
+    "http://localhost:8000/track/nft/"
   );
 };
