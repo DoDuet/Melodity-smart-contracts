@@ -1,11 +1,12 @@
 # Melodity smart contracts
-Melodity (MELD) smart contract, published and verified on 21-08-2021
+Melodity (MELD) smart contract, published and verified on 21-08-2021<br>
 Melodity crowdsale smart contract, published and verified on 24-08-2021
 
 Smart contract address: 0x93eFB0E24bb4B9F96789e2C80fd634D10690eC57 <br>
 ICO address: 0xA4c7FAe6763b60e6aFB15036EC053d75dF3291F8
 <br>
 <br>
+Additiona information:
 * Maximum supply: 1 billion MELD
 * ICO start: yet undefined
 * ICO end: yet undefined
