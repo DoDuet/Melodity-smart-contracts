@@ -1,5 +1,6 @@
 # Melodity smart contracts
 Melodity (MELD) smart contract, published and verified on 21-08-2021
+Melodity crowdsale smart contract, published and verified on 24-08-2021
 
 Smart contract address: 0x93eFB0E24bb4B9F96789e2C80fd634D10690eC57
 ICO address: 0xA4c7FAe6763b60e6aFB15036EC053d75dF3291F8
@@ -29,3 +30,8 @@ Bridge funds, used for the exchange between Melodity beats and Melodity. Balance
 **0x618e9f7bbbef323019eef457f3b94e9e7943633a**: Founder's wallet
 
 **0x1b314dca8cc5bca109dfb80bd91f647a3cd62f28**: Founder's wallet
+
+
+## Update
+
+* The funds for the ICO stored in the temporary wallet have been moved on the crowsale smart contract (24-08-2021)
