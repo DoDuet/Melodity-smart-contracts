@@ -1,21 +1,21 @@
-const Crowdsale = artifacts.require("Crowdsale");
+const Crowdsale = artifacts.require("MelodityCrowdsale");
 
 const deploy = true;
 
 module.exports = async function(_deployer) {
   if(deploy) {
-    const Melody = artifacts.require("Melody")
+    const Melody = artifacts.require("Melodity")
     const melody = await Melody.deployed()
 
     const endtime = (Date.now() / 1000 | 0) + 60 * 60 * 24 * 90 // 3 months
 
     const crowdsale = await _deployer.deploy(
       Crowdsale, 
-      (Date.now() / 1000 | 0) + 60 * 5, // starting time, now + 5min
-      endtime,
+      0, // (Date.now() / 1000 | 0) + 60 * 5, // starting time, now + 5min
+      0, // endtime,
       melody.address,
-      `55${"0".repeat(26)}`, // amount of token to release -- 8bln
-      [
+      []
+      /* [
         {
           rate: 100000,
           lower_limit: 0,
@@ -37,11 +37,11 @@ module.exports = async function(_deployer) {
           upper_limit: `55${"0".repeat(26)}`  // 5.5bln
         },
         // ~ 76,348.3575 BNB = ~ 45,809,014.5 $ (1:600) || ~ 30,539,343.00 $ (1:400)
-      ]
+      ] */
     )
     
-    melody.setCrowdsale(crowdsale.address)
-    melody.setIcoEndTime(endtime)
+    /* melody.setCrowdsale(crowdsale.address)
+    melody.setIcoEndTime(endtime) */
   }
   
 };

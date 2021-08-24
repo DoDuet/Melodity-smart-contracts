@@ -46,11 +46,24 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true,
     },
+    bsc: {
+      provider: () => new HDWalletProvider(mnemonic, `https://bsc-dataseed1.binance.org`),
+      network_id: 56,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
     development: {
       host: "127.0.0.1",
       port: 8545,
       network_id: "*"
     },
+    tenderly: {
+      host: "127.0.0.1",
+      port: 9545,
+      network_id: "*",
+      gasPrice: 0
+    }
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal
