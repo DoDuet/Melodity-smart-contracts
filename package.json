@@ -15,12 +15,12 @@
   "license": "ISC",
   "devDependencies": {
     "@truffle/hdwallet-provider": "1.2.2",
-    "truffle": "^5.4.7"
+    "truffle": "^5.4.14"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.1.9",
-    "@openzeppelin/contracts": "^4.3.0",
+    "@openzeppelin/contracts": "^4.3.2",
     "ganache-cli": "^6.12.2",
-    "web3": "^1.5.2"
+    "web3": "^1.6.0"
   }
 }
