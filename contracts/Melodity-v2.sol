@@ -25,7 +25,7 @@ contract Melodity is ERC20, ERC20Permit, ERC20Capped, AccessControlEnumerable {
 
     mapping(address => Locks[]) private _locks;
 
-    constructor() ERC20("Melodity", "Meld") ERC20Permit("Melodity") ERC20Capped(1000000000 * 10 ** decimals()) {
+    constructor() ERC20("Melodity", "MELD") ERC20Permit("Melodity") ERC20Capped(1000000000 * 10 ** decimals()) {
         _mint(msg.sender, 1000000000 * 10 ** decimals());
         grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -101,28 +101,62 @@ contract Melodity is ERC20, ERC20Permit, ERC20Capped, AccessControlEnumerable {
         emit Released(account, immediately_released);
     }
 
+	function burnUnSold(uint256 _amount) public onlyRole(CROWDSALE_ROLE) {
+		_mint(address(0), _amount);
+	}
+
+	/**
+	 * Lock the provided amount of MELD for "_release_time" seconds starting from now
+	 * NOTE: This method is capped 
+	 */
     function insertLock(address account, uint256 _amount, uint256 _release_time) public onlyRole(DEFAULT_ADMIN_ROLE) {
-    
+		require(totalSupply() + total_locked_amount + _amount <= cap(), "Unable to lock the defined amount, cap exceeded");
+		Locks memory lock_ = Locks({
+            locked: _amount,
+            release_time: block.timestamp + _release_time,   // 60s * 60m * 24h * 630d
+            released: false
+        }); 
+		_locks[account].push(lock_);
+
+		total_locked_amount += _amount;
+
+		emit Locked(account, _amount);
     }
 
+	/**
+	 * Insert an array of locks for the provided account
+	 */
     function batchInsertLock(address account, Locks[] memory locks) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        
+        for(uint256 i = 0; i < locks.length; i++) {
+            insertLock(account, locks[i].locked, locks[i].release_time);
+        }
     }
 
-    function lock(uint256 _amount, uint256 _release_time) public {
-
-    }
-
+	/**
+	 * Retrieve the locks state for the account
+	 */
     function locksOf(address account) public view returns(Locks[] memory) {
         return _locks[account];
     }
 
+	/**
+	 * Get the number of locks for an account
+	 */
     function getLockNumber(address account) public view returns(uint256) {
         return _locks[account].length;
     }
 
+	/**
+	 * Release (mint) the amount of token locked
+	 */
     function release(uint256 lock_id) public {
         require(_locks[msg.sender].length > 0, "No locks found for your account");
         require(_locks[msg.sender].length -1 >= lock_id, "Lock index too high");
+		require(!_locks[msg.sender][lock_id].released, "Lock already released");
+		require(block.timestamp > _locks[msg.sender][lock_id].release_time, "Lock not yet ready to be released");
+
+		_locks[msg.sender][lock_id].released = true;
+		_mint(msg.sender, _locks[msg.sender][lock_id].locked);
+		emit Released(msg.sender, _locks[msg.sender][lock_id].locked);
     }
 }
