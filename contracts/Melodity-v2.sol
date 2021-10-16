@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
@@ -25,8 +24,8 @@ contract Melodity is ERC20, ERC20Permit, ERC20Capped, AccessControl, ERC20Burnab
 
     mapping(address => Locks[]) private _locks;
 
-	uint256 ICO_START = 0;
-	uint256 ICO_END = 0;
+	uint256 ICO_START = 1642147200;
+	uint256 ICO_END = 1648771199;
 
     constructor() ERC20("Melodity", "MELD") ERC20Permit("Melodity") ERC20Capped(1000000000 * 10 ** decimals()) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
