@@ -55,11 +55,11 @@ contract Melodity is ERC20, ERC20Permit, ERC20Capped, AccessControl, ERC20Burnab
 		insertLock(address(0x618E9F7bbbeF323019eEf457f3b94E9E7943633A), 2800000 * pow, ICO_END - block.timestamp + one_year * 4);
 
 		// WG
-		_mint(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), five_million);
-		insertLock(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), five_million, ICO_END - block.timestamp + one_year);
-		insertLock(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), five_million, ICO_END - block.timestamp + one_year * 2);
-		insertLock(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), five_million, ICO_END - block.timestamp + one_year * 3);
-		insertLock(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), five_million, ICO_END - block.timestamp + one_year * 4);
+		_mint(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), 2400000 * pow);
+		insertLock(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), 2400000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), 2400000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), 2400000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x3198c11724024C9cE7F81816E6E6B69580fe5585), 2400000 * pow, ICO_END - block.timestamp + one_year * 4);
 
 		// Do inc - Company wallet
 		_mint(address(0x01Af10f1343C05855955418bb99302A6CF71aCB8), fifty_million);
@@ -103,11 +103,11 @@ contract Melodity is ERC20, ERC20Permit, ERC20Capped, AccessControl, ERC20Burnab
 		insertLock(address(0x2Be310D9bC184a65c9522E790E894A10eA347539), 24000 * pow, ICO_END - block.timestamp + one_year * 3);
 		insertLock(address(0x2Be310D9bC184a65c9522E790E894A10eA347539), 24000 * pow, ICO_END - block.timestamp + one_year * 4);
 
-		_mint(address(0x00), 24000 * pow);
-		insertLock(address(0x00), 24000 * pow, ICO_END - block.timestamp + one_year);
-		insertLock(address(0x00), 24000 * pow, ICO_END - block.timestamp + one_year * 2);
-		insertLock(address(0x00), 24000 * pow, ICO_END - block.timestamp + one_year * 3);
-		insertLock(address(0x00), 24000 * pow, ICO_END - block.timestamp + one_year * 4);
+		_mint(address(0x4efA9e79880a604E44Fd90B8FE13aAAFD3fCDB77), 24000 * pow);
+		insertLock(address(0x4efA9e79880a604E44Fd90B8FE13aAAFD3fCDB77), 24000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x4efA9e79880a604E44Fd90B8FE13aAAFD3fCDB77), 24000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x4efA9e79880a604E44Fd90B8FE13aAAFD3fCDB77), 24000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x4efA9e79880a604E44Fd90B8FE13aAAFD3fCDB77), 24000 * pow, ICO_END - block.timestamp + one_year * 4);
 
 		_mint(address(0x6dC6E1Db441c606Ad8557d113e8101fCe10fB44e), 20000 * pow);
 		insertLock(address(0x6dC6E1Db441c606Ad8557d113e8101fCe10fB44e), 20000 * pow, ICO_END - block.timestamp + one_year);
@@ -172,6 +172,66 @@ contract Melodity is ERC20, ERC20Permit, ERC20Capped, AccessControl, ERC20Burnab
 		insertLock(address(0x319B8D649890490Ab22C9cE8ae7ea2e0Cc61a3f8), 30000 * pow, ICO_END - block.timestamp + one_year * 4);
 
 		// donations from wg
+
+		_mint(address(0x1b314dcA8Cc5BcA109dFb80bd91f647A3cD62f28), 2400000 * pow);
+		insertLock(address(0x1b314dcA8Cc5BcA109dFb80bd91f647A3cD62f28), 2400000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x1b314dcA8Cc5BcA109dFb80bd91f647A3cD62f28), 2400000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x1b314dcA8Cc5BcA109dFb80bd91f647A3cD62f28), 2400000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x1b314dcA8Cc5BcA109dFb80bd91f647A3cD62f28), 2400000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0x435298a529750E8A65bF2589D3F41c59bCB3a274), 80000 * pow);
+		insertLock(address(0x435298a529750E8A65bF2589D3F41c59bCB3a274), 80000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x435298a529750E8A65bF2589D3F41c59bCB3a274), 80000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x435298a529750E8A65bF2589D3F41c59bCB3a274), 80000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x435298a529750E8A65bF2589D3F41c59bCB3a274), 80000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0xEe72d0857201bdc932B256A165b9c4e0C8ECF055), 80000 * pow);
+		insertLock(address(0xEe72d0857201bdc932B256A165b9c4e0C8ECF055), 80000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0xEe72d0857201bdc932B256A165b9c4e0C8ECF055), 80000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0xEe72d0857201bdc932B256A165b9c4e0C8ECF055), 80000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0xEe72d0857201bdc932B256A165b9c4e0C8ECF055), 80000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0x891539D631d4ed5E401aFa54Cc4b3197BEd73Aae), 20000 * pow);
+		insertLock(address(0x891539D631d4ed5E401aFa54Cc4b3197BEd73Aae), 20000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x891539D631d4ed5E401aFa54Cc4b3197BEd73Aae), 20000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x891539D631d4ed5E401aFa54Cc4b3197BEd73Aae), 20000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x891539D631d4ed5E401aFa54Cc4b3197BEd73Aae), 20000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0x382be12c3632Fb45347f1126361Ab94dbd88C5E1), 10000 * pow);
+		insertLock(address(0x382be12c3632Fb45347f1126361Ab94dbd88C5E1), 10000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x382be12c3632Fb45347f1126361Ab94dbd88C5E1), 10000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x382be12c3632Fb45347f1126361Ab94dbd88C5E1), 10000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x382be12c3632Fb45347f1126361Ab94dbd88C5E1), 10000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0xB40D8A30E5215DA89490D0209FEc3e6C9008fd80), 2000 * pow);
+		insertLock(address(0xB40D8A30E5215DA89490D0209FEc3e6C9008fd80), 2000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0xB40D8A30E5215DA89490D0209FEc3e6C9008fd80), 2000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0xB40D8A30E5215DA89490D0209FEc3e6C9008fd80), 2000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0xB40D8A30E5215DA89490D0209FEc3e6C9008fd80), 2000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0x91A6FfB93Ae9b7F4009978c92259b51DB1814f75), 2000 * pow);
+		insertLock(address(0x91A6FfB93Ae9b7F4009978c92259b51DB1814f75), 2000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x91A6FfB93Ae9b7F4009978c92259b51DB1814f75), 2000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x91A6FfB93Ae9b7F4009978c92259b51DB1814f75), 2000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x91A6FfB93Ae9b7F4009978c92259b51DB1814f75), 2000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0x30817A8e6Dc225B89c5670BCc5a9a66f987b7F04), 2000 * pow);
+		insertLock(address(0x30817A8e6Dc225B89c5670BCc5a9a66f987b7F04), 2000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x30817A8e6Dc225B89c5670BCc5a9a66f987b7F04), 2000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x30817A8e6Dc225B89c5670BCc5a9a66f987b7F04), 2000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x30817A8e6Dc225B89c5670BCc5a9a66f987b7F04), 2000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0x70adD435e8c9f76a263B161863d4F1f6cc1F055a), 2000 * pow);
+		insertLock(address(0x70adD435e8c9f76a263B161863d4F1f6cc1F055a), 2000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0x70adD435e8c9f76a263B161863d4F1f6cc1F055a), 2000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0x70adD435e8c9f76a263B161863d4F1f6cc1F055a), 2000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0x70adD435e8c9f76a263B161863d4F1f6cc1F055a), 2000 * pow, ICO_END - block.timestamp + one_year * 4);
+
+		_mint(address(0xF40Fccc4fefd2243Cf517ad428661963EA19866F), 2000 * pow);
+		insertLock(address(0xF40Fccc4fefd2243Cf517ad428661963EA19866F), 2000 * pow, ICO_END - block.timestamp + one_year);
+		insertLock(address(0xF40Fccc4fefd2243Cf517ad428661963EA19866F), 2000 * pow, ICO_END - block.timestamp + one_year * 2);
+		insertLock(address(0xF40Fccc4fefd2243Cf517ad428661963EA19866F), 2000 * pow, ICO_END - block.timestamp + one_year * 3);
+		insertLock(address(0xF40Fccc4fefd2243Cf517ad428661963EA19866F), 2000 * pow, ICO_END - block.timestamp + one_year * 4);
     }
 
     /**
